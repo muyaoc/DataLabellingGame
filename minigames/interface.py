@@ -1,9 +1,11 @@
 from cProfile import label
+from cgi import print_arguments
 from enum import Enum
 import os
 import cv2
 from csv import writer
 import pandas as pd
+import numpy as np
 import random
 
 
@@ -26,13 +28,6 @@ class Game():
 
     def upload_rawdata(self):
         pass
-    
-    # def create_csv(self):
-    #     # tid: (string) task id as name for the csv tasks/tid/tid.csv
-    #     with open('tasks/' + self.tid + '.csv', 'w') as file:
-    #         attr = ['ImageName', 'X1', 'Y1', 'X2', 'Y2', 'LabelName']
-    #         wri = writer(file)
-    #         wri.writerow(attr)
 
     def get_images(self, dir):
         # get all the images' paths
@@ -45,13 +40,6 @@ class Game():
         while True:
             for player in self.players.values():
                 player.listen()
-            # q = queue.Queue()
-            # while q:
-            #     message = q.get()
-            #     self.process(message)
-    
-    # def process(self, message):
-    #     pass
 
     def add_player(self, pid, role):
         if (role == "Host"):
@@ -221,19 +209,6 @@ class Labeller(Player):
         self.selected_label = None
         self.selected_seg = None
 
-    # def listen(self):
-    #     path = 'tasks/test.csv'
-    #     df = pd.read_csv(path)
-    #     unlabel_df = df[df['Label'].isnull()]
-    #     for row in unlabel_df.rows:
-    #         image_path = row['ImageName']
-    #         image = cv2.imread(image_path)
-    #         cv2.namedWindow(image_path)
-    #         cv2.imshow(image_path, image)
-    #         xy1 = (row['X1'],row['Y1'])
-    #         xy2 = (row['X2'],row['Y2'])
-    #         cv2.rectangle(image, xy1, xy2, (255, 0, 255), 1)
-
     def listen(self):
         path = 'tasks/test.csv'
         labels_list = list(self.game.labels)
@@ -270,11 +245,7 @@ class Labeller(Player):
                         cv2.destroyAllWindows()
                         break
 
-        df.to_csv(path)  # save all the labels back to the csv file
-
-                # if key == ord("n"):
-                #     cv2.destroyAllWindows()
-                #     break           
+        df.to_csv(path, index=False)  # save all the labels back to the csv file        
 
     def select_label(self, label):
         self.selected_label = label
@@ -352,7 +323,6 @@ class Guesser(Player):
                             print("Label is guessed incorrectly")
                             # TODO: add the incorrect index to []
 
-
                         cv2.destroyAllWindows()
                         break
 
@@ -379,6 +349,52 @@ class Guesser(Player):
 class Reviewer(Player):
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
+
+    def listen(self):
+        path = 'tasks/test.csv'
+        labels_list = list(self.game.labels)
+        df = pd.read_csv(path)
+        label_df = df[df['Label'].notnull()].iloc[1: , :]
+        # unlabel_df = df[df['Label'].isnull()]
+        if not label_df.equals(df.iloc[1: , :]):
+            print("Some segments need to be labelled first")
+            return
+
+        for index, row in label_df.iterrows():
+            label = row['Label']
+            print("The label for this segment is: " + label)
+            print("Do you accept(1) or reject(0) the labelling?")
+
+            image_path = row['ImageName']
+            image = cv2.imread(image_path)
+            cv2.namedWindow(image_path)
+
+            xy1 = (row['X1'],row['Y1'])
+            xy2 = (row['X2'],row['Y2'])
+            cv2.rectangle(image, xy1, xy2, (255, 0, 255), 1)
+
+            while(True):
+                cv2.imshow(image_path, image)
+
+                key = cv2.waitKey(1) & 0xFF
+
+                if key == ord("0"):
+                    df['Label'][index] = np.NaN
+                    print(label + " is rejected")
+                    cv2.destroyAllWindows()
+                    break
+                if key == ord("1"):
+                    print(label + " is accepted")
+                    # print("output the csv file")
+                    cv2.destroyAllWindows()
+                    break
+
+        df.to_csv(path, index=False)  # save all the labels back to the csv file
+        if df.isnull().values.any():
+            print("The task is not done. Some segments need to be relabelled.")
+        else:
+            print("All the segments are labelled correctly.")
+            print("Do you want to download the result (csv file)? (y/n)")
     
     def check(self, state, data):
         if state:
