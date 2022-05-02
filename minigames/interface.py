@@ -1,6 +1,3 @@
-from cProfile import label
-from cgi import print_arguments
-from enum import Enum
 import os
 import cv2
 from csv import writer
@@ -76,14 +73,6 @@ class Game():
         else:
             # output the data
             pass
-
-
-# class PlayerRole(Enum):
-#     HOST = 0
-#     LABELLER = 2
-#     PRODUCER = 1
-#     GUESSER = 3
-#     REVIEWER = 4
 
 
 class Player():
@@ -352,7 +341,6 @@ class Reviewer(Player):
 
     def listen(self):
         path = 'tasks/test.csv'
-        labels_list = list(self.game.labels)
         df = pd.read_csv(path)
         label_df = df[df['Label'].notnull()].iloc[1: , :]
         # unlabel_df = df[df['Label'].isnull()]
