@@ -13,5 +13,5 @@ if __name__ == '__main__':
     # game.add_player(0, "Host")
     # game.add_player(0, "Producer")
     # game.get_images("dataset")
-    game.add_player(0, "Labeller")
+    game.add_player(0, "Guesser")
     game.run()
