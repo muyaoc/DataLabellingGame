@@ -1,14 +1,11 @@
+from asyncio import create_task
 import os
+import shutil
 import cv2
 from csv import writer
 import pandas as pd
 import numpy as np
 import random
-
-# from packing import Packer
-# from labelling import Labeller
-# from guessing import Guesser
-# from reviewing import Reviewer
 
 
 class Game():
@@ -97,6 +94,7 @@ class Host(Player):
         print("Please set a unique task id")
         tid = input()
         self.create_task(tid)
+
         while True:
             label = input()
             if label == '\q':
@@ -106,19 +104,34 @@ class Host(Player):
     def create_task(self, tid):
         # unique task id
         # inidividual folder named by the id
-        if (os.path.exists('tasks/' + tid + '.csv')):
-            print('Task ID already exists')
-            return
+        if (os.path.exists('tasks/' + tid + '/')):
+            print('Task ID already exists. Please enter a different one.')
+            print("Or you can choose to stop creating task (;;q)")
+            ans = input()
+            if ans == ";;q":
+                return
+            else:
+                self.create_task(ans)
+
+        else:
+            os.makedirs('tasks/' + tid + '/')
+            print("Please upload the dataset you want to be labelled")
+            print("Enter the source path:")
+            # path = input()
+            path = 'test_dataset'
+            print(path)
+            self.upload_datasets(tid, path)
         
         self.game.tid = tid
 
-        with open('tasks/' + tid + '.csv', 'w') as file:
+        with open('tasks/' + tid + '/' + tid + '.csv', 'w') as file:
             attr = ['ImageName', 'X1', 'Y1', 'X2', 'Y2', 'Label']
             wri = writer(file)
             wri.writerow(attr)
 
-    def upload_datasets():
-        pass
+    def upload_datasets(self, tid, src):
+        trg = 'tasks/' + tid + '/' + 'dataset/'
+        shutil.copytree(src, trg)
 
     def create_label(self, label):
         # remove similar labels and fix typo
