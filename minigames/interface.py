@@ -1,4 +1,3 @@
-from asyncio import create_task
 import os
 import shutil
 import cv2
@@ -28,8 +27,12 @@ class Game():
     def upload_rawdata(self):
         pass
 
-    def get_images(self, dir):
+    def get_images(self, tid):
         # get all the images' paths
+        dir = 'tasks/' + tid + '/' + 'dataset/'
+        if (not os.path.exists('tasks/' + tid + '/')):
+            print("The task id does not exist.")
+            return
         for root, _, files in os.walk(dir):
             for file in files:
                 if file.endswith('.png') or file.endswith('.jpeg') or file.endswith('.jpg'):
@@ -151,26 +154,31 @@ class Packer(Player):
         if not self.game.images:
             return
 
-        root, file = self.game.images.pop()
-        file_path = os.path.join(root, file)
+        for (root, file) in self.game.images:
+            file_path = os.path.join(root, file)
+            self.current_image = cv2.imread(file_path)
 
-        self.current_image = cv2.imread(file_path)
+            cv2.namedWindow(file)
+            cv2.setMouseCallback(file, self.clickDrag)
 
-        cv2.namedWindow(file)
-        cv2.setMouseCallback(file, self.clickDrag)
+            while True:
+                cv2.imshow(file, self.current_image)
+                key = cv2.waitKey(1) & 0xFF
 
-        while True:
-            cv2.imshow(file, self.current_image)
-            key = cv2.waitKey(1) & 0xFF
+                # save and unsave
+                # TODO: reset bounding boxes
+                if key == ord("s"):
+                    self.saveCordinates(file_path, self.rects)
 
-            # TODO: exit and save
-            if key == ord("s"):
-                # print(self.rects)
-                self.saveCordinates(file_path, self.rects)
+                if key == ord("q"):
+                    cv2.destroyAllWindows()
+                    break
 
-            if key == ord("q"):
-                cv2.destroyAllWindows()
-                break
+                if key == ord("n"):
+                    # cv2.destroyWindow(file_path)
+                    self.saveCordinates(file_path, self.rects)
+                    cv2.destroyAllWindows()
+                    break
 
     # Listening for the mouse events
     def clickDrag(self, event, x, y, flags, param):
@@ -192,9 +200,12 @@ class Packer(Player):
 
     def saveCordinates(self, file, rects):
         #  output as csv file
-        path = 'tasks/'
-        csv_file = 'test.csv'  ###
-        with open(path + csv_file, 'a') as f_object:
+        dirs = os.path.dirname(file)
+        tid = os.path.split(os.path.split(dirs)[0])[1]
+
+        path = 'tasks/' + tid + '/' + tid + '.csv'
+
+        with open(path, 'a') as f_object:
             writer_object = writer(f_object)
             # writer_object.writerow([img, rects[0][0], rects[0][1], rects[1][0], rects[1][0]])  # image name, rects
             info = [file]

@@ -16,13 +16,14 @@ if __name__ == '__main__':
         game.add_player(0, "Host")
     else:
         print("Please enter the task id you want to join.")
+        tid = input()
 
         print("Please enter your role:")
         print("1: Packer    2: Labeller    3: Guesser    4: Reviewer (Host)")
         role = input()
         if role.lower() == "1" or role == "Packer":
             game.add_player(0, "Packer")
-            game.get_images("dataset")
+            game.get_images(tid)
         elif role.lower() == "2" or role == "Labeller":
             game.add_player(0, "Labeller")
         elif role.lower() == "3" or role == "Guesser":
