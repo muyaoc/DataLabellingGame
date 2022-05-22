@@ -5,6 +5,11 @@ import pandas as pd
 import numpy as np
 import random
 
+# from packing import Packer
+# from labelling import Labeller
+# from guessing import Guesser
+# from reviewing import Reviewer
+
 
 class Game():
     def __init__(self) -> None:
@@ -34,15 +39,15 @@ class Game():
                     self.images.add((root, file))
 
     def run(self):
-        while True:
-            for player in self.players.values():
-                player.listen()
+        # while True:
+        for player in self.players.values():
+            player.listen()
 
     def add_player(self, pid, role):
         if (role == "Host"):
             self.players[pid] = Host(self, pid)
-        if (role == "Producer"):
-            self.players[pid] = Producer(self, pid)
+        if (role == "Packer"):
+            self.players[pid] = Packer(self, pid)
         if (role == "Labeller"):
             self.players[pid] = Labeller(self, pid)
         if (role == "Guesser"):
@@ -89,6 +94,7 @@ class Host(Player):
 
     def listen(self):
         # get input from the keyboard
+        print("Please set a unique task id")
         tid = input()
         self.create_task(tid)
         while True:
@@ -121,7 +127,7 @@ class Host(Player):
         self.game.create_label(label)
 
 
-class Producer(Player):
+class Packer(Player):
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
 
