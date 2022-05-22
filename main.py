@@ -23,7 +23,7 @@ if __name__ == '__main__':
         role = input()
         if role.lower() == "1" or role == "Packer":
             game.add_player(0, "Packer")
-            game.get_images(tid)
+            game.get_images()
         elif role.lower() == "2" or role == "Labeller":
             game.add_player(0, "Labeller")
         elif role.lower() == "3" or role == "Guesser":

@@ -9,7 +9,7 @@ import random
 
 class Game():
     def __init__(self) -> None:
-        self.tid = 0
+        self.tid = "test"
         # self.current_player = None
         self.players = {}  # {player_id: role}
 
@@ -27,8 +27,9 @@ class Game():
     def upload_rawdata(self):
         pass
 
-    def get_images(self, tid):
+    def get_images(self):
         # get all the images' paths
+        tid = self.tid
         dir = 'tasks/' + tid + '/' + 'dataset/'
         if (not os.path.exists('tasks/' + tid + '/')):
             print("The task id does not exist.")
@@ -202,6 +203,7 @@ class Packer(Player):
         #  output as csv file
         dirs = os.path.dirname(file)
         tid = os.path.split(os.path.split(dirs)[0])[1]
+        # tid = self.game.tid
 
         path = 'tasks/' + tid + '/' + tid + '.csv'
 
@@ -229,7 +231,8 @@ class Labeller(Player):
         self.selected_seg = None
 
     def listen(self):
-        path = 'tasks/test.csv'
+        tid = self.game.tid
+        path = 'tasks/' + tid + '/' + tid + '.csv'
         labels_list = list(self.game.labels)
         df = pd.read_csv(path)
         unlabel_df = df[df['Label'].isnull()]
@@ -299,7 +302,8 @@ class Guesser(Player):
         # self.unmatch = []
     
     def listen(self):
-        path = 'tasks/test.csv'
+        tid = self.game.tid
+        path = 'tasks/' + tid + '/' + tid + '.csv'
         labels_list = list(self.game.labels)
         df = pd.read_csv(path)
         label_df = df[df['Label'].notnull()].iloc[1: , :]
@@ -370,7 +374,8 @@ class Reviewer(Player):
         super().__init__(game, pid)
 
     def listen(self):
-        path = 'tasks/test.csv'
+        tid = self.game.tid
+        path = 'tasks/' + tid + '/' + tid + '.csv'
         df = pd.read_csv(path)
         label_df = df[df['Label'].notnull()].iloc[1: , :]
         # unlabel_df = df[df['Label'].isnull()]
@@ -406,6 +411,12 @@ class Reviewer(Player):
                     # print("output the csv file")
                     cv2.destroyAllWindows()
                     break
+
+                # if key == ord(";"):
+                #     df['Label'][index] = np.NaN
+                #     print(image_path + "with" + label + " is deleted")
+                #     cv2.destroyAllWindows()
+                #     break
 
         df.to_csv(path, index=False)  # save all the labels back to the csv file
         if df.isnull().values.any():
