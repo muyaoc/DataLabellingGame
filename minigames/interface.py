@@ -85,9 +85,6 @@ class Player():
     def __init__(self, game, pid) -> None:
         self.game = game
         self.pid = pid
-    
-    # def listen():
-    #     pass
 
 class Host(Player):
     def __init__(self, game, pid) -> None:
@@ -257,7 +254,7 @@ class Labeller(Player):
 
                 key = cv2.waitKey(1) & 0xFF
 
-                # TODO: exit and save
+                # exit and save
                 if key >= 48 and key <= 57:  # key'0'-key'9'
                     number = key - 48
                     if (number <= len(labels_list) - 1):
