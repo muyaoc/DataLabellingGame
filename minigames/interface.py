@@ -1,4 +1,3 @@
-from operator import index
 import os
 import shutil
 import cv2
@@ -309,9 +308,9 @@ class Guesser(Player):
             print("Guess the label from the following options:")
 
             # random algorithm
-            labels = [row['Label']]
+            labels = [row['Label'].strip("*")]
             label_copy = labels_list.copy()
-            label_copy.remove(row['Label'])
+            label_copy.remove(row['Label'].strip("*"))
             labels += random.sample(label_copy, 2)
             random.shuffle(labels)
 
@@ -335,18 +334,16 @@ class Guesser(Player):
                 if key >= 48 and key <= 57:  # key'0'-key'9'
                     number = key - 48
                     if (number <= len(labels) - 1):
-                        if labels[number] == row['Label']:
+                        if labels[number] == row['Label'].strip("*"):
                             print("Label is guessed correctly")
                         else:
                             print("Label is guessed incorrectly")
                             df['Label'][index] += "*"  # flag the label
-                            # new_row = df.iloc[index]
-                            # new_row['Label'][index] += "*"
-                            # df2 = df2.append(new_row, ignore_index = True)
-                            # new_label = df.iloc[index]
-                            # new_label['Label'][index] = labels[number]
-                            # new_label['Label'][index] += "*"
-                            # df2 = df2.append(new_label, ignore_index = True)
+
+                            # make a copy of the object with the guesser's label 
+                            new_label = df.iloc[index]
+                            new_label[-1] = labels[number] + "*"
+                            df2 = df2.append(new_label, ignore_index = True)
 
                         cv2.destroyAllWindows()
                         break
@@ -413,9 +410,9 @@ class Reviewer(Player):
                     break
 
                 if key == ord("1"):
-                    if label[-1] == "*":  # remove the flag
-                        label = label.strip("*")
-                        df['Label'][index] = label
+                    # remove the flag
+                    label = label.strip("*")
+                    df['Label'][index] = label
 
                     print(label + " is accepted")
                     cv2.destroyAllWindows()
