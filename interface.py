@@ -15,6 +15,7 @@ class Game():
 
         self.segments = []  # a list of segments (without labels)
         # self.labels = set()
+        # a simulation of host has already identified all possible labels
         self.labels = {'a', 'b', 'c', 'd', 'e'}
         self.labelled = {}  # {seg: [label(s)]}
         self.unlabelled = []  # a list of unlabelled segments
@@ -58,7 +59,6 @@ class Game():
 
     def create_label(self, label):
         self.labels.add(label)
-        # self.labels.append(label)
 
     def annotate_seg(self, seg, label):
         if not seg in self.labelled:
@@ -200,9 +200,6 @@ class Packer(Player):
             xy2 = (self.rect[2],self.rect[3])
             cv2.rectangle(self.current_image, xy1, xy2, (255, 0, 255), 1)
             self.rects.append(self.rect)
-        
-        # if key == ord("c"):  # cancell the selecting bounding box
-        #     self.saveCordinates(file_path, self.rects)
 
     def saveCordinates(self, file, rects):
         #  output as csv file
@@ -214,25 +211,18 @@ class Packer(Player):
 
         with open(path, 'a') as f_object:
             writer_object = writer(f_object)
-            # writer_object.writerow([img, rects[0][0], rects[0][1], rects[1][0], rects[1][0]])  # image name, rects
+
             for r in rects:
                 info = [file]
                 info.extend(r)
                 writer_object.writerow(info)
 
             f_object.close()
-    
-    def make_segment(self, raw):
-        pass
-    # raw data is divided to different segments
-    # for seg in segments:
-    #     self.data.append(seg)
 
 
 class Labeller(Player):
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
-        # self.game = game
         self.selected_label = None
         self.selected_seg = None
 
@@ -275,27 +265,6 @@ class Labeller(Player):
                         break
 
         df.to_csv(path, index=False)  # save all the labels back to the csv file        
-
-    def select_label(self, label):
-        self.selected_label = label
-    
-    def select_seg(self, seg):
-        self.selected_seg = seg
-    
-    def annotate_seg(self):
-        if not self.selected_label:
-            print("No valid label is selected")
-        elif not self.selected_seg:
-            print("No segment is selected")
-        else:
-            self.game.annotate_seg(self.selected_seg, self.selected_label)
-            self.selected_label = None
-    
-    def skip_label(self):
-        if not self.selected_seg:
-            print("No segment is selected")
-        else:
-            self.game.add_unlablled_seg(self.selected_seg)
 
 
 class Guesser(Player):
@@ -364,22 +333,6 @@ class Guesser(Player):
         df = df.append(df2, ignore_index = True)
         df.to_csv(path, index=False)  # save all the labels back to the csv file
 
-    def select_label(self, label):
-        self.selected_label = label
-    
-    def guess(self):
-        seg = self.current_seg
-        label = self.selected_label
-        if label != self.game.labelled[seg]:
-            self.game.annotate_seg(seg, label)
-
-        # if label != self.game.labelled[seg]:
-        #    self.unmatch.append(seg)
-        #    self.game.labelled.remove(seg)
-    
-    def update_seg(self, seg):
-        self.current_seg = seg
-
 
 class Reviewer(Player):
     def __init__(self, game, pid) -> None:
@@ -444,9 +397,3 @@ class Reviewer(Player):
         else:
             print("All the segments are labelled correctly.")
             print("Do you want to download the result (csv file)? (y/n)")
-    
-    def check(self, state, data):
-        if state:
-            self.game.accept.append(data)
-        else:
-            self.game.reject.append(data)

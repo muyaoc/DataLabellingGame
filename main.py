@@ -4,7 +4,7 @@ Main file to execute the game.
 Author: Cindy
 """
 
-from minigames.interface import *
+from interface import *
 
 
 if __name__ == '__main__':
@@ -12,7 +12,6 @@ if __name__ == '__main__':
     print("Do you want to create a new task? (y/n)")
     ans = input()
     if ans.lower() == "y" or ans.lower() == "yes":
-        # game.create_csv()
         game.add_player(0, "Host")
     else:
         print("Please enter the task id you want to join.")
