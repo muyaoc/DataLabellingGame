@@ -234,6 +234,7 @@ class Labeller(Player):
         df = pd.read_csv(path)
         unlabel_df = df[df['Label'].isnull()]
         if unlabel_df.empty:
+            print("All the objects have already been labelled.")
             return
 
         for index, row in unlabel_df.iterrows():
