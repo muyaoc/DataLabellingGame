@@ -46,12 +46,18 @@ You will "join" an existing task as either a Packer, Labeller, Guesser or Review
 
 
 ## Dataset
-The test dataset currently used is a mixed selection of images of fruits. These images have been sourced from:
+
+The fruit dataset currently used is a mixed selection of images of fruits. These images have been sourced from:
 
 - https://www.kaggle.com/datasets/moltean/fruits
 
 - https://www.kaggle.com/datasets/mbkinaci/fruit-images-for-object-detection
 
+However, the program might perform as unintended due to large image size.
+
+Another datasets with smaller image size are considered to used for testing purpose. These images have been sourced from:
+** selfies with sunglasses:
+- https://github.com/shreyas0906/Selfies-with-sunglasses
 
 ## Framework
 The class files contained in the folder [frameworks](frameworks) demonstrate how each player client would communicate its data to a server and vice versa. Each player would call the `listen()` function in a waiting loop and respond to messages received from the server and act accordingly.
