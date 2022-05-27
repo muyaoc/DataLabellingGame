@@ -1,5 +1,11 @@
 # Data Labelling Game Framework and Simulation
 
+The artefact includes:
+- code for game frameworks
+- code for simulation of the game process
+- and the design of the game interface and visual prototype. (More details for the prototype type can be found [here](prototypes/README.md))
+
+
 ## Run the simulation
 From the root folder, simply run `python main.py` in the terminal to start the application.
 
