@@ -22,7 +22,7 @@ class Game():
         self.segments = []  # a list of segments (without labels)
         # self.labels = set()
         # a simulation of host has already identified all possible labels
-        self.labels = {'a', 'b', 'c', 'd', 'e'}
+        self.labels = {'apple', 'banana', 'cherry', 'orange', 'pear', 'kiwi'}
         self.labelled = {}  # {seg: [label(s)]}
         self.unlabelled = []  # a list of unlabelled segments
 
