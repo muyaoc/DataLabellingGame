@@ -1,3 +1,9 @@
+"""
+
+
+Author: Cindy Chen
+"""
+
 import os
 import shutil
 import cv2
@@ -82,6 +88,9 @@ class Game():
 
 
 class Player():
+    """
+    Base class for players.
+    """
     def __init__(self, game, pid) -> None:
         self.game = game
         self.pid = pid
