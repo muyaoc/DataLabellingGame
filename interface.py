@@ -29,7 +29,8 @@ class Game():
         self.segments = []  # a list of segments (without labels)
         # self.labels = set()
         # a simulation of host has already identified all possible labels
-        self.labels = {'apple', 'banana', 'cherry', 'orange', 'pear', 'kiwi'}
+        # self.labels = {'apple', 'banana', 'cherry', 'orange', 'pear', 'kiwi'}  # for fruit datasets
+        self.labels = {'sunglasses', 'teeth', 'nose', 'phone', 'hands'}  # for selfies datasets
         self.labelled = {}  # {seg: [label(s)]}
         self.unlabelled = []  # a list of unlabelled segments
 
@@ -193,8 +194,8 @@ class Packer(Player):
                 key = cv2.waitKey(1) & 0xFF
 
                 if key == ord("s"):  # save
-                    self.rects = [] 
                     self.saveCordinates(file_path, self.rects)
+                    self.rects = [] 
                 
                 if key == ord("c"):  # cancell the selecting bounding box
                     self.rects = []
@@ -208,6 +209,7 @@ class Packer(Player):
                 # save and view the next image
                 if key == ord("n"):
                     self.saveCordinates(file_path, self.rects)
+                    self.rects = []
                     cv2.destroyAllWindows()
                     break
 
