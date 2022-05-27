@@ -145,7 +145,8 @@ class Packer(Player):
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
 
-        self.rects = []  # coordinates [x1,y1,x2,y2]
+        self.rect = []  # coordinates [x1,y1,x2,y2]
+        self.rects = []  # allows for saving multiple rectangles at once
         self.current_image = None
     
     def listen(self):
@@ -165,15 +166,22 @@ class Packer(Player):
 
                 # save and unsave
                 # TODO: reset bounding boxes
-                if key == ord("s"):
-                    self.saveCordinates(file_path, self.rects)
 
-                if key == ord("q"):
+                if key == ord("s"):  # save 
+                    self.saveCordinates(file_path, self.rects)
+                
+                # if key == ord("c"):  # cancell the selecting bounding box
+                    
+                #     cv2
+                #     self.saveCordinates(file_path, self.rects)
+
+                # view the next image without saving
+                if key == ord("q"):  
                     cv2.destroyAllWindows()
                     break
-
+                
+                # save and view the next image
                 if key == ord("n"):
-                    # cv2.destroyWindow(file_path)
                     self.saveCordinates(file_path, self.rects)
                     cv2.destroyAllWindows()
                     break
@@ -185,16 +193,17 @@ class Packer(Player):
         # coordinates,top left and bottom right
 
         if event == cv2.EVENT_LBUTTONDOWN:
-            # self.rects = [(x, y)]
-            self.rects = [x, y]
+            self.rect = [x, y]
 
         elif event == cv2.EVENT_LBUTTONUP:
-            # self.rects.append((x, y))
-            self.rects.extend((x, y))
-            # cv2.rectangle(self.current_image, self.rects[0], self.rects[1], (255, 0, 255), 1)
-            xy1 = (self.rects[0], self.rects[1])
-            xy2 = (self.rects[2],self.rects[3])
+            self.rect.extend((x, y))
+            xy1 = (self.rect[0], self.rect[1])
+            xy2 = (self.rect[2],self.rect[3])
             cv2.rectangle(self.current_image, xy1, xy2, (255, 0, 255), 1)
+            self.rects.append(self.rect)
+        
+        # if key == ord("c"):  # cancell the selecting bounding box
+        #     self.saveCordinates(file_path, self.rects)
 
     def saveCordinates(self, file, rects):
         #  output as csv file
@@ -207,9 +216,10 @@ class Packer(Player):
         with open(path, 'a') as f_object:
             writer_object = writer(f_object)
             # writer_object.writerow([img, rects[0][0], rects[0][1], rects[1][0], rects[1][0]])  # image name, rects
-            info = [file]
-            info.extend(rects)
-            writer_object.writerow(info)
+            for r in rects:
+                info = [file]
+                info.extend(r)
+                writer_object.writerow(info)
 
             f_object.close()
     
