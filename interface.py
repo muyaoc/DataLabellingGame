@@ -1,5 +1,6 @@
 """
-
+Client-file classes, which include Game() and the various derived classes of Player().
+A simulation of the game process.
 
 Author: Cindy Chen
 """
@@ -14,6 +15,12 @@ import random
 
 
 class Game():
+    """
+    A base game class:
+    Handles storing of shared data that includes the existing players, types of possible labels and images.
+    Currently enqueues players to finish all their tasks before moving on to the next player.
+    """
+
     def __init__(self) -> None:
         self.tid = "test"
         # self.current_player = None
@@ -90,12 +97,18 @@ class Game():
 class Player():
     """
     Base class for players.
+    The initialization of pid is shared between all players.
     """
     def __init__(self, game, pid) -> None:
         self.game = game
         self.pid = pid
 
 class Host(Player):
+    """
+    A subclass of the Player, which introduces the functionality of the Host Role.
+    Manages the task and uploads the dataset when needed.
+    Note: Client-server I/O is currently not implemented.
+    """
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
 
@@ -128,7 +141,7 @@ class Host(Player):
             print("Please upload the dataset you want to be labelled")
             print("Enter the source path:")
             # path = input()
-            path = 'test_dataset'
+            path = 'test_dataset'  # for testing purpose
             print(path)
             self.upload_datasets(tid, path)
         
@@ -151,6 +164,10 @@ class Host(Player):
 
 
 class Packer(Player):
+    """
+    A subclass of the Player, which simulates the functionality of the Packer Role.
+    Selects bounding boxes from provided image data.
+    """
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
 
@@ -196,17 +213,19 @@ class Packer(Player):
 
     # Listening for the mouse events
     def clickDrag(self, event, x, y, flags, param):
-        # draw bounding boxes
-        # allows multiple bounding boxes in the same raw image
-        # coordinates,top left and bottom right
+        """
+        A function for drawing bounding boxes.
+        It allows multiple bounding boxes in the same raw image.
+        Coordinates are saved as (top left, bottom right) order.
+        """
 
         if event == cv2.EVENT_LBUTTONDOWN:
             self.rect = [x, y]
 
         elif event == cv2.EVENT_LBUTTONUP:
             self.rect.extend((x, y))
-            xy1 = (self.rect[0], self.rect[1])
-            xy2 = (self.rect[2],self.rect[3])
+            xy1 = (self.rect[0], self.rect[1])  # top left
+            xy2 = (self.rect[2],self.rect[3])  # bottom right
             cv2.rectangle(self.current_image, xy1, xy2, (255, 0, 255), 1)
             self.rects.append(self.rect)
 
@@ -230,6 +249,10 @@ class Packer(Player):
 
 
 class Labeller(Player):
+    """
+    A subclass of the Player, which simulates the functionality of the Labeller Role.
+    Labels existing bounding boxes
+    """
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
         self.selected_label = None
@@ -277,6 +300,11 @@ class Labeller(Player):
 
 
 class Guesser(Player):
+    """
+    A subclass of the Player, which simulates the functionality of the Guesser Role.
+    Verifies existing labels by guessing the same label that a previous labeller selected for certain bounding box.
+    Overwrites an existing label on "incorrect" guess.
+    """
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
         self.selected_label = None
@@ -318,7 +346,7 @@ class Guesser(Player):
 
                 key = cv2.waitKey(1) & 0xFF
 
-                # TODO: exit and save
+                # exit and save
                 if key >= 48 and key <= 57:  # key'0'-key'9'
                     number = key - 48
                     if (number <= len(labels) - 1):
@@ -344,6 +372,10 @@ class Guesser(Player):
 
 
 class Reviewer(Player):
+    """
+    A subclass of the Player, which simulates the functionality of the Reviewer Role.
+    Accepts and rejects produced bounding boxes/labels, and also has the ability to delete entire entries.
+    """
     def __init__(self, game, pid) -> None:
         super().__init__(game, pid)
 

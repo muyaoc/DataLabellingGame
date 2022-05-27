@@ -1,5 +1,7 @@
 # Data Labelling Game Framework and Simulation
 
+
+
 When starting the application, you will be prompted to either create a new task or join an existing task.
 
 - If you create a new task, you start a new game as the host. In this role, you set a new unique task id and upload the dataset that you want to be labelled. Since this application is a simulation, the existing test dataset is used and the application has no further function here.

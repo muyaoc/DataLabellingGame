@@ -1,6 +1,10 @@
 """
 Main file to execute the game.
 
+- Creates a new Game()
+- Adds the selected player role
+- Runs the Game()
+
 Author: Cindy
 """
 
