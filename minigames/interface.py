@@ -1,3 +1,4 @@
+from operator import index
 import os
 import shutil
 import cv2
@@ -300,11 +301,11 @@ class Guesser(Player):
         path = 'tasks/' + tid + '/' + tid + '.csv'
         labels_list = list(self.game.labels)
         df = pd.read_csv(path)
-        label_df = df[df['Label'].notnull()].iloc[1: , :]
-        if label_df.empty:
-            return
 
-        for index, row in label_df.iterrows():
+        attr = ['ImageName', 'X1', 'Y1', 'X2', 'Y2', 'Label']
+        df2 = pd.DataFrame(columns=attr)
+
+        for index, row in df.iterrows():
             print("Guess the label from the following options:")
 
             # random algorithm
@@ -338,10 +339,23 @@ class Guesser(Player):
                             print("Label is guessed correctly")
                         else:
                             print("Label is guessed incorrectly")
-                            # TODO: add the incorrect index to []
+                            df['Label'][index] += "*"  # flag the label
+                            # new_row = df.iloc[index]
+                            # new_row['Label'][index] += "*"
+                            # df2 = df2.append(new_row, ignore_index = True)
+                            # new_label = df.iloc[index]
+                            # new_label['Label'][index] = labels[number]
+                            # new_label['Label'][index] += "*"
+                            # df2 = df2.append(new_label, ignore_index = True)
 
                         cv2.destroyAllWindows()
                         break
+                
+                elif key == ord(";"):  # flag the label without adding new one
+                    df['Label'][index] += "*"
+
+        df = df.append(df2, ignore_index = True)
+        df.to_csv(path, index=False)  # save all the labels back to the csv file
 
     def select_label(self, label):
         self.selected_label = label
@@ -397,7 +411,12 @@ class Reviewer(Player):
                     print(label + " is rejected")
                     cv2.destroyAllWindows()
                     break
+
                 if key == ord("1"):
+                    if label[-1] == "*":  # remove the flag
+                        label = label.strip("*")
+                        df['Label'][index] = label
+
                     print(label + " is accepted")
                     cv2.destroyAllWindows()
                     break
