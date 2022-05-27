@@ -294,9 +294,6 @@ class Guesser(Player):
         self.selected_label = None
         self.current_seg = None
 
-        # self.labelled_data = self.game.labelled
-        # self.current_seg = self.labelled_data.keys()[0]
-        # self.unmatch = []
     
     def listen(self):
         tid = self.game.tid
@@ -349,9 +346,6 @@ class Guesser(Player):
     def select_label(self, label):
         self.selected_label = label
     
-    # def enter_diff_label(self, label):
-    #     self.selected_label = label
-
     def guess(self):
         seg = self.current_seg
         label = self.selected_label
@@ -375,12 +369,12 @@ class Reviewer(Player):
         path = 'tasks/' + tid + '/' + tid + '.csv'
         df = pd.read_csv(path)
         label_df = df[df['Label'].notnull()].iloc[1: , :]
-        # unlabel_df = df[df['Label'].isnull()]
+
         if not label_df.equals(df.iloc[1: , :]):
             print("Some segments need to be labelled first")
             return
 
-        for index, row in label_df.iterrows():
+        for index, row in df.iterrows():
             label = row['Label']
             print("The label for this segment is: " + label)
             print("Do you accept(1) or reject(0) the labelling?")
@@ -405,17 +399,20 @@ class Reviewer(Player):
                     break
                 if key == ord("1"):
                     print(label + " is accepted")
-                    # print("output the csv file")
                     cv2.destroyAllWindows()
                     break
 
-                # if key == ord(";"):
-                #     df['Label'][index] = np.NaN
-                #     print(image_path + "with" + label + " is deleted")
-                #     cv2.destroyAllWindows()
-                #     break
+                if key == ord(";"):  # delete the whole object
+                    df.iloc[index] = np.NaN
+                    print(image_path + "with" + label + " is deleted")
+                    cv2.destroyAllWindows()
+                    break
+
+        df = df.dropna(subset=["ImageName"])  # clean the entry with the deleted object
+        df = df.astype({"X1":"int","Y1":"int","X2":"int","Y2":"int"})
 
         df.to_csv(path, index=False)  # save all the labels back to the csv file
+
         if df.isnull().values.any():
             print("The task is not done. Some segments need to be relabelled.")
         else:
