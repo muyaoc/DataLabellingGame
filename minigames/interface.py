@@ -157,6 +157,8 @@ class Packer(Player):
             file_path = os.path.join(root, file)
             self.current_image = cv2.imread(file_path)
 
+            cur_img = self.current_image.copy()
+
             cv2.namedWindow(file)
             cv2.setMouseCallback(file, self.clickDrag)
 
@@ -164,16 +166,13 @@ class Packer(Player):
                 cv2.imshow(file, self.current_image)
                 key = cv2.waitKey(1) & 0xFF
 
-                # save and unsave
-                # TODO: reset bounding boxes
-
-                if key == ord("s"):  # save 
+                if key == ord("s"):  # save
+                    self.rects = [] 
                     self.saveCordinates(file_path, self.rects)
                 
-                # if key == ord("c"):  # cancell the selecting bounding box
-                    
-                #     cv2
-                #     self.saveCordinates(file_path, self.rects)
+                if key == ord("c"):  # cancell the selecting bounding box
+                    self.rects = []
+                    self.current_image = cur_img.copy()
 
                 # view the next image without saving
                 if key == ord("q"):  
